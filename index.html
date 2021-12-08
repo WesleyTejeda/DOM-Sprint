@@ -125,15 +125,22 @@
                 // tableRow.appendChild(tableDataBalance);
                 // document.getElementById("approvedBody").prepend(tableRow);
                 
-                let account = {
+                //Local Storage
+                let storageInfo = JSON.parse(localStorage.getItem("account")) || {
                     balance: 500,
                     transactions: [],
                     expenses: 0
                 };
+                updateLocalStorage(storageInfo);
+
+                function updateLocalStorage(storageInfo){
+                    localStorage.setItem("account", JSON.stringify(storageInfo));
+                }
 
                 document.getElementById("submitButton").addEventListener("click", function(e){
                     e.preventDefault();
                     console.log("Button works");
+
 
                     let formInfo = {
                         description: document.getElementById("expenseDescription").value,
@@ -160,6 +167,8 @@
                     tableRow.appendChild(tableDataDescription);
                     tableRow.appendChild(tableDataBalance);
                     document.getElementById("pendingBody").prepend(tableRow);
+
+
                 })
             </script>
 	</body>
