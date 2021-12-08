@@ -131,11 +131,17 @@
                     transactions: [],
                     expenses: 0
                 };
+                console.log(storageInfo, "Account object in storage")
                 updateLocalStorage(storageInfo);
 
-                function updateLocalStorage(storageInfo){
-                    localStorage.setItem("account", JSON.stringify(storageInfo));
-                }
+
+                // Balance
+				let balanceElement = document.getElementById("balance");
+				balanceElement.innerHTML = `$${storageInfo.balance}`
+				// Expenses
+				let expensesElement = document.getElementById("expenses");
+				expensesElement.innerHTML = `$${storageInfo.expenses}`
+                
 
                 document.getElementById("submitButton").addEventListener("click", function(e){
                     e.preventDefault();
@@ -155,6 +161,7 @@
                     tableHead.setAttribute("scope", "row")
                     let tableDataAmount = document.createElement("td");
                     tableDataAmount.innerHTML = formInfo.amount;
+                    tableDataAmount.setAttribute("class", "amountPending")
                     let tableDataType = document.createElement("td");
                     tableDataType.innerHTML = formInfo.type;
                     let tableDataDescription = document.createElement("td");
@@ -168,8 +175,21 @@
                     tableRow.appendChild(tableDataBalance);
                     document.getElementById("pendingBody").prepend(tableRow);
 
-
+                    console.log("before wait")
+                    setTimeout(() => updatePending(), 30);
                 })
+                function updateLocalStorage(storageInfo){
+                    localStorage.setItem("account", JSON.stringify(storageInfo));
+                }
+
+                function updatePending(){
+                    let temp = document.getElementsByClassName("amountPending");
+                    // console.log(temp[0]);
+                    for(let i = 0; i < temp.length; i++){
+                        console.log(temp[i]);
+                    }
+
+                }
             </script>
 	</body>
 </html>
