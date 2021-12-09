@@ -53,6 +53,9 @@
 		<!-- Main -->
 			<div id="main">
                 <h2>Pending Transactions</h2>
+                <p id="pendingText">
+                  No Pending Transactions
+                </p>
                 <table class="table">
                     <thead>
                       <tr>
@@ -60,14 +63,14 @@
                         <th scope="col">Amount</th>
                         <th scope="col">Transaction Type</th>
                         <th scope="col">Description</th>
-                        <th scope="col">Balance Post Transaction</th>
                       </tr>
                     </thead>
-                    <tbody id="pendingBody">
-                      No Pending Transactions
-                    </tbody>
+                    <tbody id="pendingBody"></tbody>
                   </table>
                 <h2>Approved Transactions</h2>
+                <p id="approvedText">
+                  No Approved Transactions
+                </p>
                 <table class="table">
                     <thead>
                       <tr>
@@ -76,11 +79,10 @@
                         <th scope="col">Transaction Type</th>
                         <th scope="col">Description</th>
                         <th scope="col">Balance Post Transaction</th>
+                        <th scope="col"></th>
                       </tr>
                     </thead>
-                    <tbody id="approvedBody">
-                      No Approved Transactions
-                    </tbody>
+                    <tbody id="approvedBody"></tbody>
                   </table>
 			</div>
 				
@@ -130,7 +132,7 @@
                 document.getElementById("submitButton").addEventListener("click", function(e){
                     e.preventDefault();
                     console.log("Button works");
-
+                    document.getElementById("pendingText").innerHTML = "";
 
                     let formInfo = {
                         description: document.getElementById("expenseDescription").value,
@@ -152,13 +154,10 @@
                     let tableDataDescription = document.createElement("td");
                     tableDataDescription.innerHTML = formInfo.description;
                     tableDataDescription.setAttribute("class", "descPending");
-                    let tableDataBalance = document.createElement("td");
-                    tableDataBalance.innerHTML = formInfo.balance;
                     tableRow.appendChild(tableHead);
                     tableRow.appendChild(tableDataAmount);
                     tableRow.appendChild(tableDataType);
                     tableRow.appendChild(tableDataDescription);
-                    tableRow.appendChild(tableDataBalance);
                     document.getElementById("pendingBody").prepend(tableRow);
 
                     console.log("before wait")
@@ -182,6 +181,41 @@
                   // Expenses
                   let expensesElement = document.getElementById("expenses");
                   expensesElement.innerHTML = `$${storageInfo.expenses}`
+                  //Prepopulate approved table
+                  if(storageInfo.approvedTransactions){
+                    console.log("posts exist")
+                    document.getElementById("approvedText").innerHTML = "";
+                  }
+                  storageInfo.approvedTransactions.forEach(transaction => {
+                    let tableRow = document.createElement("tr");
+                    let tableHead = document.createElement("th");
+                    tableHead.setAttribute("scope", "row")
+                    let tableDataAmount = document.createElement("td");
+                    tableDataAmount.innerHTML = transaction.amount;
+                    let tableDataType = document.createElement("td");
+                    tableDataType.innerHTML = transaction.type;
+                    let tableDataDescription = document.createElement("td");
+                    tableDataDescription.innerHTML = transaction.description;
+                    let tableDataBalance = document.createElement("td");
+                    tableDataBalance.innerHTML = transaction.post;
+                    let tableCell = document.createElement("td");
+                    let btn = document.createElement("button");
+                    btn.innerHTML = "Edit";
+                    btn.addEventListener("click", () => {
+                      console.log(transaction);
+                      console.log("clicked "+ transaction.description);
+                      let description = prompt("What is the new description?");
+                      console.log(description);
+                    })
+                    tableCell.appendChild(btn);
+                    tableRow.appendChild(tableHead);
+                    tableRow.appendChild(tableDataAmount);
+                    tableRow.appendChild(tableDataType);
+                    tableRow.appendChild(tableDataDescription);
+                    tableRow.appendChild(tableDataBalance);
+                    tableRow.appendChild(tableCell);
+                    document.getElementById("approvedBody").appendChild(tableRow);
+                  })
                 }
 
                 //Retrieve local storage object
@@ -235,17 +269,45 @@
                       // Expenses
                       let expensesElement = document.getElementById("expenses");
                       expensesElement.innerHTML = `$${account.expenses}`
+                      //Add new row to approved and delete table row in pending
+                      let tableRow = document.createElement("tr");
+                      let tableHead = document.createElement("th");
+                      tableHead.setAttribute("scope", "row")
+                      let tableDataAmount = document.createElement("td");
+                      tableDataAmount.innerHTML = transaction.amount;
+                      let tableDataType = document.createElement("td");
+                      tableDataType.innerHTML = transaction.type;
+                      let tableDataDescription = document.createElement("td");
+                      tableDataDescription.innerHTML = transaction.description;
+                      let tableDataBalance = document.createElement("td");
+                      tableDataBalance.innerHTML = account.balance;
+                      let tableCell = document.createElement("td");
+                      let btn = document.createElement("button");
+                      btn.innerHTML = "Edit";
+                      btn.addEventListener("click", function(){
+                        console.log("clicked "+ transaction.description);
+                      })
+                      tableCell.appendChild(btn);
+                      tableRow.appendChild(tableHead);
+                      tableRow.appendChild(tableDataAmount);
+                      tableRow.appendChild(tableDataType);
+                      tableRow.appendChild(tableDataDescription);
+                      tableRow.appendChild(tableDataBalance);
+                      tableRow.appendChild(tableCell);
+                      document.getElementById("approvedBody").prepend(tableRow);
+                      let parent = document.getElementById("pendingBody");
+                      console.log(parent);
+                      console.log(parent.lastChild);
+                      parent.removeChild(parent.lastChild);
+                      //Add text to pending table
+                      document.getElementById("pendingText").innerHTML = "No Pending Transactions"
                     })
                     console.log(account);
 
                     //Update Local Storage
                     updateLocalStorage(account);
 
-                    //Delete table row element
-                    let parent = document.getElementById("pendingBody");
-                    parent.lastChild
-                    document.getElementById("approvedBody").prepend(parent.lastChild);
-                    parent.removeChild(parent.lastChild);
+                    
                 }
             </script>
 	</body>
