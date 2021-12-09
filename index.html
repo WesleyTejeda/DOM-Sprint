@@ -227,9 +227,7 @@
                       //Prepend transaction to account
                       console.log(transaction);
                       account.approvedTransactions.unshift(transaction);
-                      //Delete table row element
-                      let parent = document.getElementById("pendingBody");
-                      parent.removeChild(parent.lastChild);
+
                       //Update balance & expenses
                       // Balance
                       let balanceElement = document.getElementById("balance");
@@ -242,6 +240,12 @@
 
                     //Update Local Storage
                     updateLocalStorage(account);
+
+                    //Delete table row element
+                    let parent = document.getElementById("pendingBody");
+                    parent.lastChild
+                    document.getElementById("approvedBody").prepend(parent.lastChild);
+                    parent.removeChild(parent.lastChild);
                 }
             </script>
 	</body>
