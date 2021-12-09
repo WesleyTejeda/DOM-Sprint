@@ -125,23 +125,7 @@
                 // tableRow.appendChild(tableDataBalance);
                 // document.getElementById("approvedBody").prepend(tableRow);
                 
-                //Local Storage
-                let storageInfo = JSON.parse(localStorage.getItem("account")) || {
-                    balance: 500,
-                    transactions: [],
-                    expenses: 0
-                };
-                console.log(storageInfo, "Account object in storage")
-                updateLocalStorage(storageInfo);
-
-
-                // Balance
-				let balanceElement = document.getElementById("balance");
-				balanceElement.innerHTML = `$${storageInfo.balance}`
-				// Expenses
-				let expensesElement = document.getElementById("expenses");
-				expensesElement.innerHTML = `$${storageInfo.expenses}`
-                
+                initStorage();
 
                 document.getElementById("submitButton").addEventListener("click", function(e){
                     e.preventDefault();
@@ -164,8 +148,10 @@
                     tableDataAmount.setAttribute("class", "amountPending")
                     let tableDataType = document.createElement("td");
                     tableDataType.innerHTML = formInfo.type;
+                    tableDataType.setAttribute("class", "typePending")
                     let tableDataDescription = document.createElement("td");
                     tableDataDescription.innerHTML = formInfo.description;
+                    tableDataDescription.setAttribute("class", "descPending");
                     let tableDataBalance = document.createElement("td");
                     tableDataBalance.innerHTML = formInfo.balance;
                     tableRow.appendChild(tableHead);
@@ -176,19 +162,86 @@
                     document.getElementById("pendingBody").prepend(tableRow);
 
                     console.log("before wait")
-                    setTimeout(() => updatePending(), 30);
+                    setTimeout(() => updatePending(), 3000);
                 })
-                function updateLocalStorage(storageInfo){
-                    localStorage.setItem("account", JSON.stringify(storageInfo));
+                
+                //Local Storage
+                function initStorage(){
+                  let storageInfo = JSON.parse(localStorage.getItem("account")) || {
+                    balance: 500,
+                    approvedTransactions: [],
+                    pendingTransactions: [],
+                    expenses: 0
+                  };
+                  console.log(storageInfo.balance);
+                  console.log(storageInfo, "Account object in storage");
+                  updateLocalStorage(storageInfo);
+                  // Balance
+                  let balanceElement = document.getElementById("balance");
+                  balanceElement.innerHTML = `$${storageInfo.balance}`
+                  // Expenses
+                  let expensesElement = document.getElementById("expenses");
+                  expensesElement.innerHTML = `$${storageInfo.expenses}`
                 }
 
-                function updatePending(){
-                    let temp = document.getElementsByClassName("amountPending");
-                    // console.log(temp[0]);
-                    for(let i = 0; i < temp.length; i++){
-                        console.log(temp[i]);
-                    }
+                //Retrieve local storage object
+                function getLocalstorage(){
+                  return JSON.parse(localStorage.getItem("account"));
+                }
+                //Updates local storage object, takes in object
+                function updateLocalStorage(storageInfo){
+                    localStorage.setItem("account", JSON.stringify(storageInfo));
+                    console.log("Local storage updated");
+                }
 
+                //Moves pending to approved table
+                function updatePending(){
+                    let account = getLocalstorage();
+                    console.log(account);
+                    let amounts = document.getElementsByClassName("amountPending");
+                    let types = document.getElementsByClassName("typePending");
+                    let description = document.getElementsByClassName("descPending");
+                    let pendingArray = [];
+                    for(let i = 0; i < amounts.length; i++){
+                        // console.log(amounts[i].innerHTML + " " + types[i].innerHTML);
+                        pendingArray.unshift({
+                          amount: parseInt(amounts[i].innerHTML),
+                          type: types[i].innerHTML,
+                          description: description[i].innerHTML
+                        })
+                    }
+                    console.log(pendingArray);
+                    pendingArray.forEach( transaction => {
+                      console.log(transaction);
+                      //Calculate post balance
+                      if(transaction.type == "withdraw"){
+                        account.balance -= transaction.amount;
+                        account.expenses += transaction.amount;
+                      }
+                      else {
+                        account.balance += transaction.amount;
+                      }
+                      //Create post balance transaction
+                      console.log(account);
+                      transaction.post = account.balance;
+                      //Prepend transaction to account
+                      console.log(transaction);
+                      account.approvedTransactions.unshift(transaction);
+                      //Delete table row element
+                      let parent = document.getElementById("pendingBody");
+                      parent.removeChild(parent.lastChild);
+                      //Update balance & expenses
+                      // Balance
+                      let balanceElement = document.getElementById("balance");
+                      balanceElement.innerHTML = `$${account.balance}`
+                      // Expenses
+                      let expensesElement = document.getElementById("expenses");
+                      expensesElement.innerHTML = `$${account.expenses}`
+                    })
+                    console.log(account);
+
+                    //Update Local Storage
+                    updateLocalStorage(account);
                 }
             </script>
 	</body>
