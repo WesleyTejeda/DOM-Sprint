@@ -6,7 +6,7 @@
 -->
 <html>
 	<head>
-		<title>Strata by HTML5 UP</title>
+		<title>Banking App</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
@@ -17,6 +17,9 @@
 
         <!-- Custom CSS -->
         <link rel="stylesheet" href="style.css">
+
+        <!-- Favicon -->
+        <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 	</head>
 	<body class="is-preload">
 
@@ -52,7 +55,7 @@
 
 		<!-- Main -->
 			<div id="main">
-                <h2>Pending Transactions</h2>
+                <h2 class="display-5">Pending Transactions</h2>
                 <p id="pendingText">
                   No Pending Transactions
                 </p>
@@ -67,7 +70,7 @@
                     </thead>
                     <tbody id="pendingBody"></tbody>
                   </table>
-                <h2>Approved Transactions</h2>
+                <h2 class="display-5">Approved Transactions</h2>
                 <p id="approvedText">
                   No Approved Transactions
                 </p>
@@ -167,10 +170,29 @@
                 //Local Storage
                 function initStorage(){
                   let storageInfo = JSON.parse(localStorage.getItem("account")) || {
-                    balance: 500,
-                    approvedTransactions: [],
+                    balance: 880,
+                    approvedTransactions: [
+                      {
+                          "amount": 40,
+                          "type": "withdraw",
+                          "description": "Gas",
+                          "post": 880
+                      },
+                      {
+                        "amount": 500,
+                        "type": "deposit",
+                        "description": "Paycheck",
+                        "post": 920
+                      },
+                      {
+                        "amount": 80,
+                        "type": "withdraw",
+                        "description": "Electric Bill",
+                        "post": 420
+                      }
+                    ],
                     pendingTransactions: [],
-                    expenses: 0
+                    expenses: 120
                   };
                   console.log(storageInfo.balance);
                   console.log(storageInfo, "Account object in storage");
@@ -191,15 +213,16 @@
                     let tableHead = document.createElement("th");
                     tableHead.setAttribute("scope", "row")
                     let tableDataAmount = document.createElement("td");
-                    tableDataAmount.innerHTML = transaction.amount;
+                    tableDataAmount.innerHTML = `$${transaction.amount}`;
                     let tableDataType = document.createElement("td");
                     tableDataType.innerHTML = transaction.type;
                     let tableDataDescription = document.createElement("td");
                     tableDataDescription.innerHTML = transaction.description;
                     let tableDataBalance = document.createElement("td");
-                    tableDataBalance.innerHTML = transaction.post;
+                    tableDataBalance.innerHTML = `$${transaction.post}`;
                     let tableCell = document.createElement("td");
                     let btn = document.createElement("button");
+                    btn.setAttribute("class", "btn btn-danger");
                     btn.innerHTML = "Delete";
                     btn.addEventListener("click", function(){
                       //Removes table row from approved table
@@ -290,16 +313,17 @@
                       let tableHead = document.createElement("th");
                       tableHead.setAttribute("scope", "row")
                       let tableDataAmount = document.createElement("td");
-                      tableDataAmount.innerHTML = transaction.amount;
+                      tableDataAmount.innerHTML = `$${transaction.amount}`;
                       let tableDataType = document.createElement("td");
                       tableDataType.innerHTML = transaction.type;
                       let tableDataDescription = document.createElement("td");
                       tableDataDescription.innerHTML = transaction.description;
                       let tableDataBalance = document.createElement("td");
-                      tableDataBalance.innerHTML = account.balance;
+                      tableDataBalance.innerHTML = `$${account.balance}`;
                       let tableCell = document.createElement("td");
                       let btn = document.createElement("button");
                       btn.innerHTML = "Delete";
+                      btn.setAttribute("class", "btn btn-danger");
                       btn.addEventListener("click", function(){
                         //Removes table row from approved table
                       this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode);
