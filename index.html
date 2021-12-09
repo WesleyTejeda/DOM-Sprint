@@ -237,8 +237,8 @@
                       else{
                         account.balance -= transaction.amount;
                       }
-                      document.getElementById("balance").innerHTML = account.balance;
-                      document.getElementById("expenses").innerHTML = account.expenses;
+                      document.getElementById("balance").innerHTML = `$${account.balance}`;
+                      document.getElementById("expenses").innerHTML = `$${account.expenses}`;
                       updateLocalStorage(account);
                     })
                     tableCell.appendChild(btn);
