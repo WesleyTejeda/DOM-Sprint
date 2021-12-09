@@ -200,12 +200,28 @@
                     tableDataBalance.innerHTML = transaction.post;
                     let tableCell = document.createElement("td");
                     let btn = document.createElement("button");
-                    btn.innerHTML = "Edit";
-                    btn.addEventListener("click", () => {
+                    btn.innerHTML = "Delete";
+                    btn.addEventListener("click", function(){
+                      //Removes table row from approved table
+                      this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode);
                       console.log(transaction);
-                      console.log("clicked "+ transaction.description);
-                      let description = prompt("What is the new description?");
-                      console.log(description);
+                      let account = getLocalstorage();
+                      for(let i = 0; i < account.approvedTransactions.length; i++){
+                        if(account.approvedTransactions[i].description === transaction.description && account.approvedTransactions[i].amount === transaction.amount && account.approvedTransactions[i].type === transaction.type){
+                          account.approvedTransactions.splice(i, 1);
+                        }
+                      }
+                      //Reverse funds
+                      if(transaction.type === "withdraw"){
+                        account.balance += transaction.amount;
+                        account.expenses -= transaction.amount;
+                      }
+                      else{
+                        account.balance -= transaction.amount;
+                      }
+                      document.getElementById("balance").innerHTML = account.balance;
+                      document.getElementById("expenses").innerHTML = account.expenses;
+                      updateLocalStorage(account);
                     })
                     tableCell.appendChild(btn);
                     tableRow.appendChild(tableHead);
@@ -283,9 +299,28 @@
                       tableDataBalance.innerHTML = account.balance;
                       let tableCell = document.createElement("td");
                       let btn = document.createElement("button");
-                      btn.innerHTML = "Edit";
+                      btn.innerHTML = "Delete";
                       btn.addEventListener("click", function(){
-                        console.log("clicked "+ transaction.description);
+                        //Removes table row from approved table
+                      this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode);
+                      console.log(transaction);
+                      let account = getLocalstorage();
+                      for(let i = 0; i < account.approvedTransactions.length; i++){
+                        if(account.approvedTransactions[i].description === transaction.description && account.approvedTransactions[i].amount === transaction.amount && account.approvedTransactions[i].type === transaction.type){
+                          account.approvedTransactions.splice(i, 1);
+                        }
+                      }
+                      //Reverse funds
+                      if(transaction.type === "withdraw"){
+                        account.balance += transaction.amount;
+                        account.expenses -= transaction.amount;
+                      }
+                      else{
+                        account.balance -= transaction.amount;
+                      }
+                      document.getElementById("balance").innerHTML = `$${account.balance}`;
+                      document.getElementById("expenses").innerHTML = `$${account.expenses}`;
+                      updateLocalStorage(account);
                       })
                       tableCell.appendChild(btn);
                       tableRow.appendChild(tableHead);
