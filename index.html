@@ -20,6 +20,10 @@
 
         <!-- Favicon -->
         <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+
+        <!-- Fontawesome -->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous">
+
 	</head>
 	<body class="is-preload">
 
@@ -27,11 +31,11 @@
         <header id="header">
             <div class="display-balance">
                 <div class="balance">
-                    <h2>Balance</h2>
+                    <h2 class="display-6">Balance</h2>
                     <p id="balance" class="totalBalance">$500</p>
                 </div>
                 <div class="expenses">
-                    <h2>Expenses</h2>
+                    <h2 class="display-6">Expenses</h2>
                     <p id="expenses" class="totalExpenses">$200</p>
                 </div>
             </div>
@@ -93,7 +97,7 @@
 			<footer id="footer">
 				<div class="inner">
 					<ul class="copyright">
-						<li>&copy; Untitled</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+						<li>&copy; Banking App</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
 					</ul>
 				</div>
 			</footer>
@@ -105,51 +109,35 @@
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
-            <!-- <tr>
-                <th scope="row">1</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr> -->
+            
             <script>
-                console.log("Working");
-                //Element creation format
-                // let tableRow = document.createElement("tr");
-                // tableRow.innerHTML = "4";
-                // let tableHead = document.createElement("th");
-                // tableHead.setAttribute("scope", "row")
-                // let tableDataAmount = document.createElement("td");
-                // let tableDataType = document.createElement("td");
-                // let tableDataDescription = document.createElement("td");
-                // let tableDataBalance = document.createElement("td");
-                // tableRow.appendChild(tableHead);
-                // tableRow.appendChild(tableDataAmount);
-                // tableRow.appendChild(tableDataType);
-                // tableRow.appendChild(tableDataDescription);
-                // tableRow.appendChild(tableDataBalance);
-                // document.getElementById("approvedBody").prepend(tableRow);
-                
                 initStorage();
 
+                // Submit button event listener
                 document.getElementById("submitButton").addEventListener("click", function(e){
                     e.preventDefault();
-                    console.log("Button works");
+                    //Clear pending table message
                     document.getElementById("pendingText").innerHTML = "";
-
+                    // Creating formInfo object to contain values inputted by user
                     let formInfo = {
                         description: document.getElementById("expenseDescription").value,
                         amount: document.getElementById("expenseAmount").value,
                         type: document.getElementById("form-select").value,
                         balance: document.getElementById("balance").innerHTML
                     }
-                    console.log(formInfo);
-
+                    //Create new elements
                     let tableRow = document.createElement("tr");
                     let tableHead = document.createElement("th");
                     tableHead.setAttribute("scope", "row")
                     let tableDataAmount = document.createElement("td");
-                    tableDataAmount.innerHTML = formInfo.amount;
+                    if(formInfo.type === "withdraw"){
+                      tableDataAmount.innerHTML = formInfo.amount;
+                      tableDataAmount.style.color = "red";
+                    }
+                    else{
+                      tableDataAmount.innerHTML = formInfo.amount;
+                      tableDataAmount.style.color = "green";
+                    }
                     tableDataAmount.setAttribute("class", "amountPending")
                     let tableDataType = document.createElement("td");
                     tableDataType.innerHTML = formInfo.type;
@@ -163,12 +151,13 @@
                     tableRow.appendChild(tableDataDescription);
                     document.getElementById("pendingBody").prepend(tableRow);
 
-                    console.log("before wait")
+                    // Waits 3 seconds before excuting function to clear pending table
                     setTimeout(() => updatePending(), 3000);
                 })
                 
                 //Local Storage
                 function initStorage(){
+                  //Pulls object from storage, initializes if it doesn't exist
                   let storageInfo = JSON.parse(localStorage.getItem("account")) || {
                     balance: 880,
                     approvedTransactions: [
@@ -194,8 +183,6 @@
                     pendingTransactions: [],
                     expenses: 120
                   };
-                  console.log(storageInfo.balance);
-                  console.log(storageInfo, "Account object in storage");
                   updateLocalStorage(storageInfo);
                   // Balance
                   let balanceElement = document.getElementById("balance");
@@ -205,15 +192,23 @@
                   expensesElement.innerHTML = `$${storageInfo.expenses}`
                   //Prepopulate approved table
                   if(storageInfo.approvedTransactions){
-                    console.log("posts exist")
                     document.getElementById("approvedText").innerHTML = "";
                   }
+                  //Loop through approved array to post data to each row
                   storageInfo.approvedTransactions.forEach(transaction => {
+                    //Create new elements
                     let tableRow = document.createElement("tr");
                     let tableHead = document.createElement("th");
                     tableHead.setAttribute("scope", "row")
                     let tableDataAmount = document.createElement("td");
-                    tableDataAmount.innerHTML = `$${transaction.amount}`;
+                    if(transaction.type === "withdraw"){
+                      tableDataAmount.innerHTML = `-$${transaction.amount}`;
+                      tableDataAmount.style.color = "red";
+                    }
+                    else{
+                      tableDataAmount.innerHTML = `+$${transaction.amount}`;
+                      tableDataAmount.style.color = "green";
+                    }
                     let tableDataType = document.createElement("td");
                     tableDataType.innerHTML = transaction.type;
                     let tableDataDescription = document.createElement("td");
@@ -227,8 +222,8 @@
                     btn.addEventListener("click", function(){
                       //Removes table row from approved table
                       this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode);
-                      console.log(transaction);
                       let account = getLocalstorage();
+                      //Matches the correct storage index to delete
                       for(let i = 0; i < account.approvedTransactions.length; i++){
                         if(account.approvedTransactions[i].description === transaction.description && account.approvedTransactions[i].amount === transaction.amount && account.approvedTransactions[i].type === transaction.type){
                           account.approvedTransactions.splice(i, 1);
@@ -264,13 +259,11 @@
                 //Updates local storage object, takes in object
                 function updateLocalStorage(storageInfo){
                     localStorage.setItem("account", JSON.stringify(storageInfo));
-                    console.log("Local storage updated");
                 }
 
                 //Moves pending to approved table
                 function updatePending(){
                     let account = getLocalstorage();
-                    console.log(account);
                     let amounts = document.getElementsByClassName("amountPending");
                     let types = document.getElementsByClassName("typePending");
                     let description = document.getElementsByClassName("descPending");
@@ -283,9 +276,7 @@
                           description: description[i].innerHTML
                         })
                     }
-                    console.log(pendingArray);
                     pendingArray.forEach( transaction => {
-                      console.log(transaction);
                       //Calculate post balance
                       if(transaction.type == "withdraw"){
                         account.balance -= transaction.amount;
@@ -295,10 +286,8 @@
                         account.balance += transaction.amount;
                       }
                       //Create post balance transaction
-                      console.log(account);
                       transaction.post = account.balance;
                       //Prepend transaction to account
-                      console.log(transaction);
                       account.approvedTransactions.unshift(transaction);
 
                       //Update balance & expenses
@@ -313,7 +302,14 @@
                       let tableHead = document.createElement("th");
                       tableHead.setAttribute("scope", "row")
                       let tableDataAmount = document.createElement("td");
-                      tableDataAmount.innerHTML = `$${transaction.amount}`;
+                      if(transaction.type === "withdraw"){
+                        tableDataAmount.innerHTML = `-$${transaction.amount}`;
+                        tableDataAmount.style.color = "red";
+                      }
+                      else{
+                        tableDataAmount.innerHTML = `+$${transaction.amount}`;
+                        tableDataAmount.style.color = "green";
+                      }
                       let tableDataType = document.createElement("td");
                       tableDataType.innerHTML = transaction.type;
                       let tableDataDescription = document.createElement("td");
@@ -327,7 +323,6 @@
                       btn.addEventListener("click", function(){
                         //Removes table row from approved table
                       this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode);
-                      console.log(transaction);
                       let account = getLocalstorage();
                       for(let i = 0; i < account.approvedTransactions.length; i++){
                         if(account.approvedTransactions[i].description === transaction.description && account.approvedTransactions[i].amount === transaction.amount && account.approvedTransactions[i].type === transaction.type){
@@ -355,18 +350,14 @@
                       tableRow.appendChild(tableCell);
                       document.getElementById("approvedBody").prepend(tableRow);
                       let parent = document.getElementById("pendingBody");
-                      console.log(parent);
-                      console.log(parent.lastChild);
                       parent.removeChild(parent.lastChild);
+
                       //Add text to pending table
                       document.getElementById("pendingText").innerHTML = "No Pending Transactions"
                     })
-                    console.log(account);
-
+                    
                     //Update Local Storage
                     updateLocalStorage(account);
-
-                    
                 }
             </script>
 	</body>

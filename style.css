@@ -21,6 +21,13 @@
     align-items: center;
 }
 
+.totalBalance {
+    color: green !important
+}
+.totalExpenses {
+    color: red !important
+}
+
 #header h2 {
     margin-top: 12px;
     color: black ;
@@ -31,3 +38,9 @@
     margin-top: 12px;
     font-size: 48px;
 }
+
+@media only screen and (max-width: 980px) {
+    .display-balance {
+        margin-bottom: 24px;
+    }
+  }
